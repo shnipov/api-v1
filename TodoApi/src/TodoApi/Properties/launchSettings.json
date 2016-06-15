@@ -18,8 +18,7 @@
     },
     "TodoApi": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/doc",
+      "launchUrl": "http://localhost:5000/doc/index.html#!/RussianPostCalculator/ApiRussianPostCalculatorGet",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

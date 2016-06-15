@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.SwaggerGen.Generator;
-using TodoApi.Models;
+using TodoApi.Models.RussianPost;
 
 namespace TodoApi
 {
@@ -44,12 +44,16 @@ namespace TodoApi
                     Title = "Delivery API"
                 });
 
+                options.DescribeAllEnumsAsStrings();
+
                 string xmlDocPath = Path.Combine(_env.ContentRootPath,  @"bin\Debug\netcoreapp1.0\TodoApi.xml");
                 if (File.Exists(xmlDocPath))
                 {
                     options.IncludeXmlComments(xmlDocPath);
                 }
             });
+
+            services.AddScoped<IRussianPostLogic, RussianPostLogic>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

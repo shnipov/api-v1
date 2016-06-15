@@ -12,7 +12,6 @@ namespace TodoApi.Controllers
     [Route("api/[controller]")]
     public class CalculatorController : Controller
     {
-
         /// <summary>
         /// Расчитать варианты доставки
         /// </summary>
