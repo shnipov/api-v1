@@ -33,17 +33,15 @@ namespace TodoApi
             services.AddMvc();
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
-            services.AddSwaggerGen();
-
-            // Базовые настройки документации API
-            services.ConfigureSwaggerGen(options =>
+            // Настройки документации API
+            services.AddSwaggerGen(options =>
             {
                 options.SingleApiVersion(new Info
                 {
                     Version = "v1",
-                    Description = "API для управления задачами",
+                    Description = "Работа с доставкой",
                     TermsOfService = "-",
-                    Title = "Todo API"
+                    Title = "Delivery API"
                 });
 
                 string xmlDocPath = Path.Combine(_env.ContentRootPath,  @"bin\Debug\netcoreapp1.0\TodoApi.xml");
@@ -52,9 +50,6 @@ namespace TodoApi
                     options.IncludeXmlComments(xmlDocPath);
                 }
             });
-
-            // Работа с задачами
-            services.AddSingleton<ITodoRepository, TodoRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

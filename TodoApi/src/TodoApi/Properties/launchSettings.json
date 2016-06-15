@@ -19,7 +19,7 @@
     "TodoApi": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/todo",
+      "launchUrl": "http://localhost:5000/doc",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
