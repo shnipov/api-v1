@@ -1,62 +1,62 @@
-namespace TodoApi.Models
+п»їnamespace TodoApi.Models
 {
     /// <summary>
-    /// Адрес
+    /// РђРґСЂРµСЃ
     /// </summary>
     public class Address
     {
         /// <summary>
-        /// Индекс
+        /// РРЅРґРµРєСЃ
         /// </summary>
         public string PostalCode { get; set; }
 
         /// <summary>
-        /// Страна
+        /// РЎС‚СЂР°РЅР°
         /// </summary>
         public string Country { get; set; }
 
         /// <summary>
-        /// Субъект
+        /// РЎСѓР±СЉРµРєС‚
         /// </summary>
         public string Region { get; set; }
 
         /// <summary>
-        /// Район
+        /// Р Р°Р№РѕРЅ
         /// </summary>
         public string Area { get; set; }
 
         /// <summary>
-        /// Город
+        /// Р“РѕСЂРѕРґ
         /// </summary>
         public string City { get; set; }
 
         /// <summary>
-        /// Район города
+        /// Р Р°Р№РѕРЅ РіРѕСЂРѕРґР°
         /// </summary>
         public string CityDistrict { get; set; }
 
         /// <summary>
-        /// Населённый пункт
+        /// РќР°СЃРµР»С‘РЅРЅС‹Р№ РїСѓРЅРєС‚
         /// </summary>
         public string Settlement { get; set; }
 
         /// <summary>
-        /// Улица
+        /// РЈР»РёС†Р°
         /// </summary>
         public string Street { get; set; }
 
         /// <summary>
-        /// Дом
+        /// Р”РѕРј
         /// </summary>
         public string House { get; set; }
 
         /// <summary>
-        /// Номер расширения дома
+        /// РќРѕРјРµСЂ СЂР°СЃС€РёСЂРµРЅРёСЏ РґРѕРјР°
         /// </summary>
         public string Block { get; set; }
 
         /// <summary>
-        /// Квартира
+        /// РљРІР°СЂС‚РёСЂР°
         /// </summary>
         public string Flat { get; set; }
     }
