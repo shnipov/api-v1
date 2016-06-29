@@ -1,6 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.SwaggerGen.Annotations;
 using TodoApi.Models.RussianPost;
+using Type = TodoApi.Models.RussianPost.Type;
 
 // TODO Вынести контракты в отдельную сборку
 
@@ -88,9 +94,161 @@ namespace TodoApi.Controllers
         /// </remarks>
         /// <returns></returns>
         [HttpGet]
-        public async Task<RussianPostCalculateResponse> Calculate([FromQuery]RussianPostCalculateRequest request)
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK, Description = "Результат расчёта", Type = typeof(RussianPostCalculateResponse))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, Description = "Сообщение об ошибках", Type = typeof(string))]
+        public async Task<IActionResult> Calculate([FromQuery] RussianPostCalculateRequest request)
         {
-            return await _russianPostLogic.Calculate(request);
+            try
+            {
+                return Ok(await _russianPostLogic.Calculate(request));
+            }
+            catch (Exception ex)
+            {
+                return ExceptionHandling.Handle(this, ex);
+            }
+        }
+
+        /// <summary>
+        /// Рассчитать стоимость по тарифу "Посылка"
+        /// </summary>
+        [HttpGet("Parcel")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK, Description = "Результат расчёта")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, Description = "Сообщение об ошибках", Type = typeof(string))]
+        public async Task<IActionResult> Calculate([FromQuery] RussianPostParcelCalculateRequest request)
+        {
+            try
+            {
+                Category cat = GetRussianPostCategory(request.Sumoc, request.Sumnp);
+
+                var response = await _russianPostLogic.Calculate(new RussianPostCalculateRequest
+                {
+                    Typ = (int) Type.Parcel,
+                    Cat = (int) cat,
+                    Dir = (int) Direction.Internal,
+                    From = request.From,
+                    To = request.To,
+                    Weight = request.Weight,
+                    Sumoc = request.Sumoc,
+                    Sumnp = request.Sumnp,
+                    IsAvia = (int?) Avia.No
+                });
+
+                return Ok(new
+                {
+                    Name = response.TypCatName,
+                    PriceNoNds = response.Pay / 100.00m,
+                    PriceWithDns = response.PayNds / 100.0m,
+                    response.ApiUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return ExceptionHandling.Handle(this, ex);
+            }
+        }
+
+        /// <summary>
+        /// Рассчитать стоимость по тарифу "Посылка Онлайн"
+        /// </summary>
+        [HttpGet("ParcelOnline")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK, Description = "Результат расчёта")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, Description = "Сообщение об ошибках", Type = typeof(string))]
+        public async Task<IActionResult> Calculate([FromQuery] RussianPostParcelOnlineCalculateRequest request)
+        {
+            try
+            {
+                Category cat = GetRussianPostCategory(request.Sumoc, request.Sumnp);
+
+                var response = await _russianPostLogic.Calculate(new RussianPostCalculateRequest
+                {
+                    Typ = (int)Type.ParcelOnline,
+                    Cat = (int)cat,
+                    Dir = (int)Direction.Internal,
+                    From = request.From,
+                    To = request.To,
+                    Sumoc = request.Sumoc,
+                    Sumnp = request.Sumnp,
+                    IsAvia = (int?)Avia.No
+                });
+
+                return Ok(new
+                {
+                    Name = response.TypCatName,
+                    PriceNoNds = response.Pay / 100.00m,
+                    PriceWithDns = response.PayNds / 100.0m,
+                    response.ApiUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return ExceptionHandling.Handle(this, ex);
+            }
+        }
+
+        /// <summary>
+        /// Рассчитать стоимость по тарифу "Курьер Онлайн"
+        /// </summary>
+        [HttpGet("CourierOnline")]
+        [Authorize("Token")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK, Description = "Результат расчёта")]
+        [SwaggerResponse(HttpStatusCode.BadRequest, Description = "Сообщение об ошибках", Type = typeof(string))]
+        public async Task<IActionResult> Calculate([FromQuery] RussianPostCourierOnlineCalculateRequest request)
+        {
+            try
+            {
+                Category cat = GetRussianPostCategory(request.Sumoc, null);
+
+                var response = await _russianPostLogic.Calculate(new RussianPostCalculateRequest
+                {
+                    Typ = (int)Type.CourierOnline,
+                    Cat = (int)cat,
+                    Dir = (int)Direction.Internal,
+                    From = request.From,
+                    To = request.To,
+                    Sumoc = request.Sumoc,
+                    IsAvia = (int?)Avia.No
+                });
+
+                return Ok(new
+                {
+                    Name = response.TypCatName,
+                    PriceNoNds = response.Pay / 100.00m,
+                    PriceWithDns = response.PayNds / 100.0m,
+                    response.ApiUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return ExceptionHandling.Handle(this, ex);
+            }
+        }
+
+        private static Category GetRussianPostCategory(int? sumoc, int? sumnp)
+        {
+            Category cat = Category.Parcel;
+            if (sumoc.HasValue && sumoc.Value > 0)
+            {
+                if (sumnp.HasValue && sumnp.Value > 0)
+                {
+                    cat = Category.ParcelWithPaymentPrice;
+                }
+                else
+                {
+                    cat = Category.ParcelWithDeclaredPrice;
+                }
+            }
+            else
+            {
+                if (sumnp.HasValue && sumnp.Value > 0)
+                {
+                    throw new RussianPostCalculateException("Необходимо указать Sumoc", new List<string>());
+                }
+            }
+            return cat;
         }
     }
 }
